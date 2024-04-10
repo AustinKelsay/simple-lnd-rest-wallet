@@ -1,106 +1,87 @@
+// Import the necessary dependencies
+// - React: The core React library
+// - useState: A hook from React that allows functional components to have state
+// - axios: A library for making HTTP requests
 import React, { useState } from "react";
 import axios from "axios";
 
+// Define the LightningWallet functional component
+// It receives props: host, port, macaroon, and lightningBalance
 function LightningWallet({ host, port, macaroon, lightningBalance }) {
-    const [receiveShowing, setReceiveShowing] = useState(false); // For toggling the receive form
-    const [sendShowing, setSendShowing] = useState(false); // For toggling the send form
-    const [invoice, setInvoice] = useState(""); // For paying an invoice
-    const [amount, setAmount] = useState(""); // For creating an invoice
-    const [memo, setMemo] = useState(""); // Optional memo for the invoice
+  // Use the useState hook to manage the component's state
+  // - receiveShowing: A boolean indicating whether the receive form is visible (default: false)
+  // - sendShowing: A boolean indicating whether the send form is visible (default: false)
+  // - invoice: A string to store the invoice to be paid (default: empty string)
+  // - amount: A string to store the amount when creating an invoice (default: empty string)
+  const [receiveShowing, setReceiveShowing] = useState(false);
+  const [sendShowing, setSendShowing] = useState(false);
+  const [invoice, setInvoice] = useState("");
+  const [amount, setAmount] = useState("");
 
-    const createInvoice = async () => {
-        try {
-            const response = await axios.post(
-                `${host}:${port}/v1/invoices`,
-                {
-                    value: amount,
-                    memo: memo,
-                },
-                {
-                    headers: {
-                        "grpc-metadata-macaroon": macaroon,
-                    },
-                }
-            );
-    
-            console.log("Create invoice response:", response.data);
-            alert(`Invoice created successfully\n\n${response.data.payment_request}`);
-            setReceiveShowing(false);
-            setAmount("");
-            setMemo("");
-        } catch (error) {
-            console.error("Error creating invoice:", error);
-            const errorMessage = error.response?.data?.error || error.message;
-            alert(`Failed to create invoice: ${errorMessage}`);
-        }
-    };
-    
-    const payInvoice = async () => {
-        try {
-            const response = await axios.post(
-                `${host}:${port}/v1/channels/transactions`,
-                {
-                    payment_request: invoice,
-                },
-                {
-                    headers: {
-                        "grpc-metadata-macaroon": macaroon,
-                    },
-                }
-            );
-    
-            console.log("Pay invoice response:", response.data);
-            alert(`Invoice paid successfully\n\npayment preimage: ${response.data.payment_preimage}`);
-            setSendShowing(false);
-            setInvoice("");
-        } catch (error) {
-            console.error("Error paying invoice:", error);
-            const errorMessage = error.response?.data?.error || error.message;
-            alert(`Failed to pay invoice: ${errorMessage}`);
-        }
-    };
+  // Function to create an invoice
+  const createInvoice = async () => {
+    // Implement the logic to create an invoice here
+    // You can use the `host`, `port`, `macaroon`, and `amount` variables
+    // to make an HTTP request to your Lightning node's API
+    // and handle the response accordingly
+  };
 
-    return (
-        <div>
-            <div className="balance">
-                <h3>Lightning balance</h3>
-                <p>{lightningBalance} sats</p>
-            </div>
-            <div>
-                <button onClick={() => setReceiveShowing(!receiveShowing)}>Receive</button>
-                <button onClick={() => setSendShowing(!sendShowing)}>Send</button>
-            </div>
+  // Function to pay an invoice
+  const payInvoice = async () => {
+    // Implement the logic to pay an invoice here
+    // You can use the `host`, `port`, `macaroon`, and `invoice` variables
+    // to make an HTTP request to your Lightning node's API
+    // and handle the response accordingly
+  };
 
-            {receiveShowing && (
-                <div className="invoice-form">
-                    <input
-                        type="text"
-                        placeholder="Amount"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Memo (Optional)"
-                        value={memo}
-                        onChange={(e) => setMemo(e.target.value)}
-                    />
-                    <button onClick={createInvoice}>Create Invoice</button>
-                </div>
-            )}
-            {sendShowing && (
-                <div className="invoice-form">
-                    <input
-                        type="text"
-                        placeholder="Invoice"
-                        value={invoice}
-                        onChange={(e) => setInvoice(e.target.value)}
-                    />
-                    <button onClick={payInvoice}>Pay Invoice</button>
-                </div>
-            )}
+  // The component's render method
+  // It returns the JSX that defines the structure and appearance of the component
+  return (
+    <div>
+      {/* Display the lightning balance */}
+      <div className="balance">
+        <h3>Lightning balance</h3>
+        <p>{lightningBalance} sats</p>
+      </div>
+
+      {/* Buttons to toggle the receive and send forms */}
+      {/* When clicked, they update the respective state variables */}
+      <div>
+        <button onClick={() => setReceiveShowing(!receiveShowing)}>Receive</button>
+        <button onClick={() => setSendShowing(!sendShowing)}>Send</button>
+      </div>
+
+      {/* Render the receive form if receiveShowing is true */}
+      {/* It displays an input field for the amount and a button to create an invoice */}
+      {receiveShowing && (
+        <div className="invoice-form">
+          <input
+            type="text"
+            placeholder="Amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+          <button onClick={createInvoice}>Create Invoice</button>
         </div>
-    );
+      )}
+
+      {/* Render the send form if sendShowing is true */}
+      {/* It displays an input field for the invoice and a button to pay the invoice */}
+      {sendShowing && (
+        <div className="invoice-form">
+          <input
+            type="text"
+            placeholder="Invoice"
+            value={invoice}
+            onChange={(e) => setInvoice(e.target.value)}
+          />
+          <button onClick={payInvoice}>Pay Invoice</button>
+        </div>
+      )}
+    </div>
+  );
 }
 
+// Export the LightningWallet component as the default export
+// This allows other files to import and use this component
 export default LightningWallet;
