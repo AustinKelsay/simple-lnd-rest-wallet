@@ -19,20 +19,62 @@ function LightningWallet({ host, port, macaroon, lightningBalance }) {
   const [amount, setAmount] = useState("");
 
   // Function to create an invoice
-  const createInvoice = async () => {
-    // Implement the logic to create an invoice here
-    // You can use the `host`, `port`, `macaroon`, and `amount` variables
-    // to make an HTTP request to your Lightning node's API
-    // and handle the response accordingly
-  };
+const createInvoice = async () => {
+  try {
+    // Define the request options
+    const options = {
+      method: "POST",
+      url: `${host}:${port}/v1/invoices`,
+      data: {
+        value: amount,
+      },
+      headers: {
+        "grpc-metadata-macaroon": macaroon,
+      },
+    };
 
-  // Function to pay an invoice
-  const payInvoice = async () => {
-    // Implement the logic to pay an invoice here
-    // You can use the `host`, `port`, `macaroon`, and `invoice` variables
-    // to make an HTTP request to your Lightning node's API
-    // and handle the response accordingly
-  };
+    // Make the API request to create an invoice
+    const response = await axios(options);
+
+    // Display the created invoice's payment request in an alert
+    alert(`Invoice created successfully\n\n${response.data.payment_request}`);
+
+    // Reset the form state
+    setReceiveShowing(false);
+    setAmount("");
+  } catch (error) {
+    alert(`Failed to create invoice: ${JSON.stringify(error.response?.data)}`);
+  }
+};
+
+// Function to pay an invoice
+const payInvoice = async () => {
+  try {
+    // Define the request options
+    const options = {
+      method: "POST",
+      url: `${host}:${port}/v1/channels/transactions`,
+      data: {
+        payment_request: invoice,
+      },
+      headers: {
+        "grpc-metadata-macaroon": macaroon,
+      },
+    };
+
+    // Make the API request to pay the invoice
+    const response = await axios(options);
+
+    // Display the payment preimage in an alert
+    alert(`Invoice paid successfully\n\npayment preimage: ${response.data.payment_preimage}`);
+
+    // Reset the form state
+    setSendShowing(false);
+    setInvoice("");
+  } catch (error) {
+    alert(`Failed to pay invoice: ${JSON.stringify(error.response?.data)}`);
+  }
+};
 
   // The component's render method
   // It returns the JSX that defines the structure and appearance of the component
