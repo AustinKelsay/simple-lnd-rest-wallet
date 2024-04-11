@@ -44,8 +44,11 @@ function App() {
     }
   };
 
+  // https://lightning.engineering/api-docs/api/lnd/lightning/get-info
   const getInfo = async function () {
+    // Try will try to run the code, if it fails it will catch the error
     try {
+      // Define the request options for the getinfo endpoint
       const options = {
         method: "GET",
         url: `${host}:${port}/v1/getinfo`,
@@ -53,18 +56,23 @@ function App() {
           "grpc-metadata-macaroon": macaroon,
         },
       };
-  
+
+      // Make the API request to get the node info
       const response = await axios(options);
+      // Log the response data to the console
       console.log("getinfo", response.data);
   
       if (response.data) {
+        // Set the connected node state to the response data
         setConnectedNode(response.data);
       }
     } catch (error) {
+      // If there is an error, alert the user with the error message
       alert(`Failed to get info: ${JSON.stringify(error.response?.data)}`);
     }
   };
   
+  // https://lightning.engineering/api-docs/api/lnd/lightning/list-channels
   const loadChannels = async function () {
     try {
       const options = {
@@ -86,6 +94,7 @@ function App() {
     }
   };
   
+  // https://lightning.engineering/api-docs/api/lnd/lightning/channel-balance
   const loadChannelBalances = async function () {
     try {
       const options = {
@@ -107,6 +116,7 @@ function App() {
     }
   };
   
+  // https://lightning.engineering/api-docs/api/lnd/lightning/wallet-balance
   const loadOnchainBalance = async function () {
     try {
       const options = {
